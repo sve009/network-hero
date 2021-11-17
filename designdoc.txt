@@ -1,0 +1,59 @@
+Design:
+
+Tools:
+  - SDL
+
+Big questions:
+  - Simultaneous(!) or in order?
+
+General:
+  - Differentiation of roles
+  - More health = Greater importance on buffs + debuffs + status effects
+
+Mon design:
+  - Attack
+  - Defense (health? maybe?)
+  - S. Attack
+  - S. Defense
+  - Agility = Speed / Dodge / Acc
+  - Status att + res
+  - Element
+  - Move list
+
+Moves:
+  - Power (damage)
+  - Accuracy
+  - Number of uses
+  - Element
+  - Effect
+
+Actions:
+  - Use a move
+  - Switch
+  - Guard
+  - (items if time)
+
+Elemental system:
+  - Fire
+  - Water
+  - Air
+  - Rock
+  - Electric
+
+  Water -> Fire
+  Fire -> Air
+  Air -> Rock
+  Rock -> Electricity
+  Electricity -> Water
+
+  Electric -> Air
+  Air -> Water
+  Water -> Rock
+  Rock -> Fire
+  Fire -> Electric
+
+Coding Elements:
+  - Parser for stats page
+  - Server code
+  - Client code
+  - Possible SDL implementation
