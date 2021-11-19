@@ -48,7 +48,7 @@ Multiple Components:
       
       This is where things get slightly more complicated, as we need to design a complete system for clients to
       communicate with each other and the server. We came up with a couple of approaches, one being the traditional
-      server-centric appraoch where the clients send the server their actions for the turn and then the server updates
+      server-centric approach where the clients send the server their actions for the turn and then the server updates
       the game state and broadcasts it back to the client.
 
       For this approach we need a way of sending both actions and game state from server to client and client to server.
