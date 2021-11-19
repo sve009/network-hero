@@ -3,11 +3,11 @@
 ## About
 
 A multiplier turn-based rpg in the style of the Nintendo and Gamefreak classic series that shall not be named.
-Players select a team of "cybers" and then engage in combat until only one player has any cybers left stadning.
+Players select a team of "cybers" and then engage in combat until only one player has any cybers left standing.
 Complexity is added through simultaneous action selection, and a fleshed out typing + statistical system. 
 
 The user will see the client-side UI, which will allow them to select a party, and then during battle choose when
-to use moves and swap cybers. This will also have display funcionality, and as a stretch goal a visual interface. 
+to use moves and swap cybers. This will also have display functionality, and as a stretch goal a visual interface. 
 (Command-line based for now).
 
 Stats and what they do:
@@ -17,7 +17,7 @@ Defense: determines how much damage will be negated from attacks and also determ
 S. Attack: Determines the effectiveness of special attacks held by cybers
 S. Defense: Determines the amount of resistance held by cyber against opponent S. Attack
 Agility: Combination of Speed, Dodge, and Accuracy stats that you would find in other games
-Status (attack + resistance): Status stat determines both effectiveness of status attacks as well as resistance to oppenent's status attacks.
+Status (attack + resistance): Status stat determines both effectiveness of status attacks as well as resistance to opponent's status attacks.
 Element: Cybers will be typed, there will be 5 elements: fire, water, rock, air, electricity. 
 Each type is strong against two other types and weak against the other two types remaining.
 
@@ -81,7 +81,7 @@ Multiple Components:
 
       This'll be hard.
 
-  - Development tools (parsers + tools to make it easier to balance) (maybe stats tracking) (filesystems)
+  - Development tools (parsers + tools to make it easier to balance) (maybe stats tracking) (file systems)
     - Parser for cyber stats file, to assist in development + balancing
     - Parser for move list for similar reasons
 
@@ -93,11 +93,11 @@ Multiple Components:
     - Draw sprites
     - Only if we have time
 
-## Issues with Implemention
+## Issues with Implementation
 
 Many things could go wrong with this. For one thing, if a client disconnects and then reconnects, the game
 states may be out of sync with each other, which could lead to a lot of issues and frustration on the part
-of the players. Also, having the game math on the clientside limits design space, as there can't be any
+of the players. Also, having the game math on the client-side limits design space, as there can't be any
 impure functions within the game math due to the game states needing to remain independently synchronized.
 
 Also, writing the UI loop could be tricky, as it's always fairly difficult to deal with random-ass user input.
@@ -107,6 +107,6 @@ so there could be numerous issues that pop up there.
 
 Finally, the biggest thing that could go wrong is that we have no idea if we can even design a fun game. It
 would be kinda lame if everything works and the project still sucks so that would be a rough one. Finally,
-parsers are pretty fiddily and annoying to write, although we have control over the format so that should alleviate
+parsers are pretty fiddly and annoying to write, although we have control over the format so that should alleviate
 things somewhat.
 
