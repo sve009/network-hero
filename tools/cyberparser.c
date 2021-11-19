@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 
-#include "cybers.h"
+#include "../cybers.h"
 
 int main(int argc, char** args) {
     // Check to ensure there are two args:
@@ -122,12 +122,12 @@ int main(int argc, char** args) {
     // Print initial segment
     fprintf(d, "#ifndef CYBERLIST\n");
     fprintf(d, "#define CYBERLIST\n");
-    fprintf(d, "const cyber_t* cybers = [");
+    fprintf(d, "const cyber_t* cybers = {");
 
     // Write each cyber
     for (int i = 0; i < num_cybers; i++) {
         // Print cyber
-        fprintf(d, "{%s, %d, %d, %d, %d, %d, %d, %d, %d, {%s, %s, %s, %s}}",
+        fprintf(d, "{\"%s\", %d, %d, %d, %d, %d, %d, %d, %d, {\"%s\", \"%s\", \"%s\", \"%s\"}}",
                 cybers[i]->name,
                 cybers[i]->health,
                 cybers[i]->attack,
@@ -150,7 +150,7 @@ int main(int argc, char** args) {
 
 
     // Print closing segment
-    fprintf(d, "];\n");
+    fprintf(d, "};\n");
     fprintf(d, "#endif\n");
 
     // Close destination
