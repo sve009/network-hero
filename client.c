@@ -3,8 +3,15 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "cybers.h"
+
 // Include global option output based on menu level here
 char* options1[] = {"use move\n", "swap cyber\n", "guard\n"};
+
+// Print a cyber
+void print_cyber(cyber_t* cyber) {
+    printf("%s: %d | %s\n", cyber->name, cyber->health, elements[cyber->element]);
+}
 
 // Main function (crazy)
 int main(int argc, char** args) {
@@ -14,6 +21,8 @@ int main(int argc, char** args) {
     // Buffer for user input
     char* buffer = NULL; // input buffer
     size_t len = 0;         // len of input
+
+    game_t* state = NULL;
 
     // Loop forever
     while (true) {
