@@ -2,7 +2,7 @@
 #define CYBER_H
 
 // Element lookup table
-const char* elements[] = {"Fire", "Water", "Rock", "Electric", "Air"};
+static const char* elements[] = {"Fire", "Water", "Rock", "Electric", "Air"};
 
 /**
  * The main data structure used to hold each Cyber
