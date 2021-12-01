@@ -4,6 +4,31 @@
 #include <pthread.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+
+#include "cybers.h"
+#include "conv.h"
+
+// Function for listening to clients
+void* listen_client(void* sock_fd) {
+    // Buffer for reading action
+    char buffer[2000];
+
+    // Action to pass into parser
+    action_t* a = malloc(sizeof(action_t));
+
+    // Grab the socket fd
+    int fd = *(int*)sock_fd;
+
+    // Wait to receive action
+    read(fd, buffer, 2000);
+
+    // Get the action
+    parse_action(a, buffer);
+    
+    return (void*)a;
+}
+
 
 int main(int argc, char** args) {
     // Create socket
@@ -53,10 +78,37 @@ int main(int argc, char** args) {
     // Spawn threads to listen to connections
     pthread_t threads[2];
 
-    for (int i = 0; i < 2; i++) {
-    }
-        
+    // Get two actions every turn
+    action_t* actions[2];
 
+    // Main game loop
+    while (1) {
+        // Spawn threads to listen for actions
+        for (int i = 0; i < 2; i++) {
+            // Create thread
+            pthread_create(&threads[i], NULL, listen_client, (void*)&clients[i]);
+
+            // Error check
+            if (threads[i] == NULL) {
+                perror("Thread creation failed");
+                exit(2);
+            }
+        }
+
+        // Get actions
+        for (int i = 0; i < 2; i++) {
+            // Join threads
+            int r = pthread_join(threads[i], (void*)&actions[i]);
+
+            // Error check
+            if (r != 0) {
+                perror("Join threads failed");
+                exit(2);
+            }
+        }
+
+        // We should now have both actions, put game math here
+    }
     return 0;
 }
 

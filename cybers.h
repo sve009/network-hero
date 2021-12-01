@@ -1,5 +1,5 @@
-#ifndef CYBER
-#define CYBER
+#ifndef CYBER_H
+#define CYBER_H
 
 // Element lookup table
 const char* elements[] = {"Fire", "Water", "Rock", "Electric", "Air"};
@@ -30,5 +30,15 @@ typedef struct game {
     cyber_t p1[3];
     cyber_t p2[3];
 } game_t;
+
+/**
+ * An action that a player takes. Clients send
+ *   actions to the server, which uses the two
+ *   to update the game state.
+ */
+typedef struct action {
+    char specifier[10];
+    char arg[15];
+} action_t;
 
 #endif
