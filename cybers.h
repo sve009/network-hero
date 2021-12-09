@@ -4,13 +4,33 @@
 // Element lookup table
 static const char* elements[] = {"Fire", "Water", "Rock", "Electric", "Air"};
 
+// Status lookup table
+static const char* statuses[] = {"Dizzy", "Enraged", "Weakened", "Hardened"};
+
+/**
+ * This struct holds the necessary information to calculate
+ * outcomes of the move when attacking.
+**/
+typedef struct move {
+    char * name;
+    int move_pp;
+    int damage;
+    int sdamage;
+    int status_eff; //-1 if no status effect
+    int status_target; //0 = opponent, 1 == self
+} move_t;
+
 /**
  * The main data structure used to hold each Cyber
  * Holds stats and moves
  * That's about it
 */
-typedef struct __attribute__((packed)) cyber {
+typedef struct cyber {
+    //char * curr_stat could be added in to make it so that we can have status effects last longer
+    //int stat_dur could also be added in to count the amount of turns the status lingers for
     char* name;    // Name
+    int curr_stat; // Stores active status effect on cyber
+    int stat_durr; // Stores amount of turns left for status effect
     int health;    // Health
     int attack;    // Physical attack
     int defense;   // Physical defense
@@ -26,6 +46,8 @@ typedef struct __attribute__((packed)) cyber {
  * Truncated cyber for sending elements that change
  */
 typedef struct __attribute__((packed)) t_cyber {
+    int curr_stat; // Stores active status effect on cyber
+    int stat_durr; // Stores amount of turns left for status effect
     int health;    // Health
     int attack;    // Physical attack
     int defense;   // Physical defense

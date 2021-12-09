@@ -7,38 +7,47 @@
 #include "cybers.h"
 
 
-void attack(cyber_t * attacker, cyber_t * defender, char * attack){
-    //things that need to be accounted for on the attackers side:
-        //Attack, S. Attack, Element, Status Effect/Efficacy, Agility (ability to hit an agile opponent)
-    int attack = attacker->attack;
-    int sattack = attacker->sattack;
-    int att_element = attacker->element;
-    char * status_att = NULL; //this will be determined by the attack, if left NULL then no status effect
-    int status_eff = attacker->statmanip;
-    int att_agil = attacker->agility;
+int attack(t_cyber_t * attacker, t_cyber_t * defender, move_t * move, int guard) {
+    //function will return 0 on unsuccessful attack, and 1 on successful attack
+    
+    
+    //might be best to check move_pp before calling attack function
+    if (move->move_pp == 0) {
+        printf("cannot use this move\n");
+        return 0;
+    }
 
-    //things that need to be account for on the defender's side:
-        //health, defense, S. defense, agility(dodge), Status Effect Resistance, element
-    int health = defender->health;
-    int defense = defender->defense;
-    int sdefense = defender->sdefense;
-    int def_agil = defender->agility;
-    int status_res = defender->statmanip;
-    int def_element = defender->element;
+    //checking and getting rid of expired status attacks before attack begins
+    //stat_durr should be decremented by the server at the end of every turn
+    if (attacker->curr_stat != -1 && attacker->stat_durr == 0) {
+        attacker->curr_stat = -1;
+    }
+    if (defender->curr_stat != -1 && defender->stat_durr == 0) {
+        defender->curr_stat = -1;
+    }
 
     //so I assume that we'll need like attack rolls, so random and time are probably going to be necessary
     srand(time());
     
-    //I think some checks in order could go like: dodge? elemental weakness or strength? special attack? regular attack? status effect?
-    
-    if (((att_agil - def_agil) * (rand() % 10)) > 50) { 
-        //this is the first option that came to my mind for dodge rolls, there is probably a better way
-        //attack successful
-    } else {
-        //attack dodged/missed/etc.
+    //calculating dodge roll with status effects considered
+    int dodge_roll = (attacker->agility - defender->agility) + (rand() % 20);
+    if (defender->curr_stat == 0) {
+        dodge_roll -= 5;
+    } else if (attacker->curr_stat == 0) {
+        dodge_roll += 5;
     }
+    if (dodge_roll < 20) {
+        //attack unsuccessful
+        return 0;
+    }
+    
 
-    int elemental_mod = 0; //-1 if defender weak, 0 if neutral, 1 if defender strong
+    //need to caculate attack modifiers incorporating elemental comparison, status effects
+    //and the difference between the cyber's attack and defense stats
+    int att_mod = 0;
+    int satt_mod = 0;
+
+    //elemental comparison
     //fire = 0, water = 1, air = 2, rock = 3, electric = 4
     if ((def_element == 0 && att_element == 1) ||
         (def_element == 0 && att_element == 3) ||
@@ -50,7 +59,8 @@ void attack(cyber_t * attacker, cyber_t * defender, char * attack){
         (def_element == 3 && att_element == 1) ||
         (def_element == 4 && att_element == 0) ||
         (def_element == 4 && att_element == 3)) {
-            elemental_mod = -1;
+            att_mod++;
+            satt_mod++;            
     } else if (
         (def_element == 0 && att_element == 2) ||
         (def_element == 0 && att_element == 4) ||
@@ -59,11 +69,56 @@ void attack(cyber_t * attacker, cyber_t * defender, char * attack){
         (def_element == 2 && att_element == 1) ||
         (def_element == 2 && att_element == 3) ||
         (def_element == 3 && att_element == 4) ||
-        (def_element == 3 && att_element == 0) ||
+        (def_element== 3 && att_element == 0) ||
         (def_element == 4 && att_element == 2) ||
         (def_element == 4 && att_element == 1)) {
-            elemental_mod = 1;
+            att_mod--;
+            satt_mod--;
     }
 
-    //we will need to define attacks and special attacks to procede
+    //status effect checks
+    if (attacker->curr_stat == 1) {
+        att_mod++;
+        satt_mod++;
+    } else if (attacker->curr_stat == 2) {
+        att_mod--;
+        satt_mod--;
+    }
+    if (defender->curr_stat == 2) {
+        att_mod++;
+        satt_mod++;
+    } else if (defender->curr_stat == 3) {
+        att_mod--;
+        satt_mod--;
+    }
+
+    //attack defense stat comparisons, maybe this just functions at bonus damage
+    int bonus_damage = attacker->attack - defender->defense;
+    int bonus_sdamage = attacker->sattack - defender->sdefense;
+    
+    //damage calculation will be a combination of additive and multiplicative damage mods
+    int damage = (move->damage + bonus_damage) * att_mod;
+    damabe += (move->sdamage + bonus_sdamage) * satt_mod;
+
+    //guarding results in less damage for defender
+    if (guard) {
+        damage = damage / 2;
+    }
+    //update cyber's health, status, and the move's pp
+    defender->health -= damage;
+    
+    //check status effect durations at the beginning of attack
+    //calculating new status rolls now
+    if (move->stat_eff > -1) { 
+        if (stat_target == 0){
+            if (((attacker->statmanip - defender->statmanip) + (rand() % 20)) > 20) {
+                defender->curr_stat = move->stat_eff;
+                defender->stat_durr = 1;
+            }
+        } else {
+            attacker->curr_stat = move->stat_eff;
+            attacker->stat_durr = 1;
+        }
+    }
+    
 }
