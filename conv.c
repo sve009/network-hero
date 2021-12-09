@@ -11,9 +11,9 @@ void parse_action(action_t* dest, char* src) {
     sscanf(src, "%9s\n%14s", &dest->specifier, &dest->arg);    
 }
 
-void stringify_action(char* dest, action_t* src) {
+void stringify_action(char** dest, action_t* src) {
    // Print into dest
-   sprintf(dest, "%s\n%s", src->specifier, src->arg);
+   sprintf(*dest, "%s\n%s", src->specifier, src->arg);
 } 
 
 void stringify_cyber(char* dest, cyber_t* src) {
@@ -68,4 +68,3 @@ void parse_cyber(cyber_t* dest, char* src) {
     // Set field
     dest->moves = moves;
 }
-    

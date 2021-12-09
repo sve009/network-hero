@@ -17,7 +17,7 @@ void parse_action(action_t* dest, char* src);
 /**
  * Action -> String
  */
-void stringify_action(char* dest, action_t* src);
+void stringify_action(char** dest, action_t* src);
 
 /**
  * Cyber -> String
