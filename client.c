@@ -42,8 +42,8 @@ void restore_cyber(cyber_t* dest, t_cyber_t* src) {
 void update_gamestate(t_game_t* m) {
     for (int i = 0; i < 3; i++) {
         // Copy the truncated data into local game state
-        memcpy(&initial_state.p1[i].health, &m->elems[i], sizeof(t_cyber_t));
-        memcpy(&initial_state.p2[i].health, &m->elems[i+3], sizeof(t_cyber_t));
+        memcpy(&initial_state.p1[i].curr_stat, &m->elems[i], sizeof(t_cyber_t));
+        memcpy(&initial_state.p2[i].curr_stat, &m->elems[i+3], sizeof(t_cyber_t));
     }
 }
 

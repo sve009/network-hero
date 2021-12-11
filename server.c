@@ -9,6 +9,8 @@
 #include "cybers.h"
 #include "conv.h"
 #include "cyberlist.h"
+#include "movelist.h"
+#include "actions.h"
 
 // Main game state
 game_t state;
@@ -159,7 +161,7 @@ int main(int argc, char** args) {
         char resp_mess[200];
         memset(resp_mess, 0, sizeof(char) * 200);
 
-        // Switch code
+        // Swap code
         for (int i = 0; i < 2; i++) {
             if (strcmp(actions[i]->specifier, "swap") == 0) {
                 char swap_msg[50];
@@ -181,16 +183,48 @@ int main(int argc, char** args) {
         }
 
         // Guard code
+        int p1_guard = 0;
+        int p2_guard = 0;
         for (int i = 0; i < 2; i++) {
             if (strcmp(actions[i]->specifier, "guard") == 0) {
                 // Add description to response message
                 char guard_mess[20];
                 sprintf(guard_mess, "Player %d guarded\n", i);
                 strcat(resp_mess, guard_mess);
+
+                // Set guard flags
+                if (i == 0) {
+                    p1_guard = 1;
+                } else {
+                    p2_guard = 1;
+                }
             }
         }
 
         // Attack code
+
+        for (int i = 0; i < 2; i++) {
+            if (strcmp(actions[i]->specifier, "move") == 0) {
+                char move_mess[300];
+                memset(move_mess, 0, sizeof(char)*300);
+
+                // Debug:
+                printf("%s\n", actions[i]->arg);
+
+                // Move lookup to turn move name into struct
+                move_t* m = lookup_move(actions[i]->arg);
+
+                if (i == 0) {
+                    attack(&state.p1[state.active_p1], &state.p2[state.active_p2], m, p2_guard, move_mess);
+                } else {
+                    attack(&state.p2[state.active_p2], &state.p1[state.active_p1], m, p1_guard, move_mess);
+                }
+
+                // Add log message
+                strcat(resp_mess, move_mess);
+            }
+        }
+
         
         // Prep game state to send
         t_game_t message;
