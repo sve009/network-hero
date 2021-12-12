@@ -125,13 +125,9 @@ int main(int argc, char** args) {
 
         // Death cases
         if (player_n == 0 && initial_state.p1[initial_state.active_p1].health <= 0) {
-            printf("%s fucking died\n",
-                    initial_state.p1[initial_state.active_p1].name);
             menu = 2;
         }
-        if (player_n == 0 && initial_state.p2[initial_state.active_p2].health <= 0) {
-            printf("%s fucking died\n",
-                    initial_state.p2[initial_state.active_p2].name);
+        if (player_n == 1 && initial_state.p2[initial_state.active_p2].health <= 0) {
             menu = 2;
         }
 
@@ -171,13 +167,24 @@ int main(int argc, char** args) {
             } else if (menu == 1) {
                 // Print out moves of active cyber
                 int i = 0;
-                while (initial_state.p1[0].moves[i] != NULL && i < 4) {
-                    printf("%s\n", initial_state.p1[0].moves[i++]);
+                if (player_n == 0) {
+                    while (initial_state.p1[initial_state.active_p1].moves[i] != NULL && i < 4) {
+                        printf("%s\n", initial_state.p1[0].moves[i++]);
+                    }
+                } else {
+                    while (initial_state.p2[initial_state.active_p2].moves[i] != NULL && i < 4) {
+                        printf("%s\n", initial_state.p1[0].moves[i++]);
+                    }
                 }
+
             } else if (menu == 2) {
                 // Print out list of cybers to switch to
                 for (int i = 0; i < 3; i++) {
-                    printf("%s\n", initial_state.p1[i].name);
+                    if (player_n == 0) {
+                        print_cyber(&initial_state.p1[i]);
+                    } else {
+                        print_cyber(&initial_state.p2[i]);
+                    }
                 }
             } 
 

@@ -7,7 +7,9 @@
 #include "cybers.h"
 #include "actions.h"
 
-
+/**
+ * Note: Assume rand is already seeded
+ */
 int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, char* log) {
     //function will return 0 on unsuccessful attack, and 1 on successful attack
     
@@ -38,7 +40,6 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     }
 
     //so I assume that we'll need like attack rolls, so random and time are probably going to be necessary
-    srand(time(NULL));
     
     //calculating dodge roll with status effects considered
     int dodge_roll = (attacker->agility - defender->agility) + (rand() % 20);
@@ -59,8 +60,8 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
 
     //need to caculate attack modifiers incorporating elemental comparison, status effects
     //and the difference between the cyber's attack and defense stats
-    int att_mod = 0;
-    int satt_mod = 0;
+    int att_mod = 2;
+    int satt_mod = 2;
 
     //elemental comparison
     //fire = 0, water = 1, air = 2, rock = 3, electric = 4
@@ -127,6 +128,13 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     memset(dmg, 0, sizeof(char)*50);
     sprintf(dmg, "It did %d damage\n", damage);
     strcat(log, dmg);
+
+    // Log death cases
+    if (defender->health <= 0) {
+        char death[50];
+        sprintf(death, "%s died\n", defender->name);
+        strcat(log, death);
+    }
     
     //check status effect durations at the beginning of attack
     //calculating new status rolls now

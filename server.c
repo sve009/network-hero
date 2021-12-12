@@ -59,6 +59,9 @@ void* listen_client(void* sock_fd) {
 
 
 int main(int argc, char** args) {
+    // Seed rand
+    srand(time(NULL));
+
     // Set the initial party
     for (int i = 0; i < 3; i++) {
         memcpy(&state.p1[i], cybers, sizeof(cyber_t));
@@ -233,9 +236,11 @@ int main(int argc, char** args) {
         // Debug
         printf("%s\n", resp_mess);
         
-        // Trivial response to release clients
+        // Response to release clients
         for (int i = 0; i < 2; i++) {
+            // Current gamestate
             write(clients[i], &message, sizeof(t_game_t));
+            // Log messages
             write(clients[i], resp_mess, sizeof(char)*200);
         }
 
