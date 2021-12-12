@@ -101,13 +101,16 @@ int main(int argc, char** args) {
         int i = 0;
 
         // Run through the move list
-        while ((rlen = getline(&buffer, &len, s)) != -1 && len > 0) {
+        while (i < 4 && (rlen = getline(&buffer, &len, s)) != -1 && len > 0) {
             // Strip newline
             buffer[rlen - 1] = '\0';
 
             // Stick in move list
             cybers[num_cybers]->moves[i++] = strdup(buffer);
         }
+
+        // Get extra line:
+        rlen = getline(&buffer, &len, s);
 
         // Repeats here, extra line after cyber captured in
         //   while loop
@@ -122,12 +125,24 @@ int main(int argc, char** args) {
     // Print initial segment
     fprintf(d, "#ifndef CYBERLIST\n");
     fprintf(d, "#define CYBERLIST\n");
-    fprintf(d, "const cyber_t* cybers = {");
+
+    // Write each moveset
+    for (int i = 0; i < num_cybers; i++) {
+        fprintf(d, "char* moves%d = {\"%s\", \"%s\", \"%s\", \"%s\"};\n",
+                i,
+                cybers[i]->moves[0],
+                cybers[i]->moves[1],
+                cybers[i]->moves[2],
+                cybers[i]->moves[3]);
+    }
+
+    // Write cyber header
+    fprintf(d, "cyber_t cybers[] = {");
 
     // Write each cyber
     for (int i = 0; i < num_cybers; i++) {
         // Print cyber
-        fprintf(d, "{\"%s\", %d, %d, %d, %d, %d, %d, %d, %d, {\"%s\", \"%s\", \"%s\", \"%s\"}}",
+        fprintf(d, "{\"%s\", %d, %d, %d, %d, %d, %d, %d, %d, moves%d}",
                 cybers[i]->name,
                 cybers[i]->health,
                 cybers[i]->attack,
@@ -137,14 +152,11 @@ int main(int argc, char** args) {
                 cybers[i]->agility,
                 cybers[i]->statmanip,
                 cybers[i]->element,
-                cybers[i]->moves[0],
-                cybers[i]->moves[1],
-                cybers[i]->moves[2],
-                cybers[i]->moves[3]);
+                i);
 
         // Print the comma if not the last element
         if (i < num_cybers - 1) {
-            printf(", ");
+            fprintf(d, ", ");
         }
     }
 

@@ -1,6 +1,9 @@
 CC=gcc
 CFlAGS=-I.
 
+cyberparser:
+	$(CC) -o tools/cyberparser tools/cyberparser.c
+
 movelist:
 	$(CC) -c movelist.c
 
