@@ -25,3 +25,17 @@ slap
 kick
 fall
 bite
+
+Brad
+100
+10
+10
+10
+10
+10
+10
+2
+overaggressive high five
+water bottle flip
+vape
+drink

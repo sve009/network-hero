@@ -15,6 +15,11 @@
 // Main game state
 game_t state;
 
+typedef struct client_data {
+    int client;
+    int player_no;
+} client_data_t;
+
 // Prep cyber_t into t_cyber_t
 void prep_cyber(t_cyber_t* dest, cyber_t* src) {
     // Just copy over the relevant fields of the cyber
@@ -55,6 +60,87 @@ void* listen_client(void* sock_fd) {
 
     // Return the action
     return (void*)a;
+}
+
+void* client_setup(void* sock_fd) {
+    // Accumulator to see how many messages client has sent
+    int n = 0;
+
+    // Socket
+    client_data_t* data = sock_fd;
+
+    printf("Client: %d\n", data->client);
+    printf("Player: %d\n", data->player_no);
+
+    // Buffer for message
+    char buffer[50];
+    memset(buffer, 0, sizeof(char) * 50);
+
+    // Loop until all three chosen
+    while (n < 3) {
+        // Read in cyber name
+        read(data->client, buffer, sizeof(char) * 50);
+
+        // Debug
+        printf("%s\n", buffer);
+
+        // Look up cyber (Client checks validity)
+        int i;
+        for (i = 0; i < num_cybers; i++) {
+            if (strcmp(cybers[i].name, buffer) == 0) {
+                break;
+            }
+        }
+
+        // Set cyber
+        if (data->player_no == 0) {
+            memcpy(&state.p1[n], &cybers[i], sizeof(cyber_t));
+        } else {
+            memcpy(&state.p2[n], &cybers[i], sizeof(cyber_t));
+        }
+
+        // Increment n
+        n++;
+    }
+    return NULL;
+}
+
+
+
+void setup_clients(int clients[]) {
+    // thread holders
+    pthread_t threads[2];
+
+    // Arguments
+    client_data_t args[2];
+
+    // Get initial state from clients
+    for (int i = 0; i < 2; i++) {
+        // Set argument
+        args[i].client = clients[i];
+        args[i].player_no = i;
+
+        // Create thread
+        pthread_create(&threads[i], NULL, client_setup, (void*)&args[i]);
+    }
+
+    // Wait for inputs
+    for (int i = 0; i < 2; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    // Send initial opponent choices back to client
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (i == 0) {
+                printf("Sending: %s\n", state.p2[j].name);
+                write(clients[i], state.p2[j].name, sizeof(char)*50);
+            } else {
+                printf("Sending: %s\n", state.p1[j].name);
+                write(clients[i], state.p1[j].name, sizeof(char)*50);
+            }
+        }
+    }
 }
 
 
@@ -122,6 +208,9 @@ int main(int argc, char** args) {
     for (int i = 0; i < 2; i++) {
         write(clients[i], &i, sizeof(int));
     }
+
+    // Setup initial game state
+    setup_clients(clients);
 
     // Spawn threads to listen to connections
     pthread_t threads[2];

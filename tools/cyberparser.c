@@ -126,9 +126,12 @@ int main(int argc, char** args) {
     fprintf(d, "#ifndef CYBERLIST\n");
     fprintf(d, "#define CYBERLIST\n");
 
+    // Print number of cybers
+    fprintf(d, "static int num_cybers = %d;\n", num_cybers);
+
     // Write each moveset
     for (int i = 0; i < num_cybers; i++) {
-        fprintf(d, "char* moves%d = {\"%s\", \"%s\", \"%s\", \"%s\"};\n",
+        fprintf(d, "char* moves%d[] = {\"%s\", \"%s\", \"%s\", \"%s\"};\n",
                 i,
                 cybers[i]->moves[0],
                 cybers[i]->moves[1],
@@ -142,7 +145,7 @@ int main(int argc, char** args) {
     // Write each cyber
     for (int i = 0; i < num_cybers; i++) {
         // Print cyber
-        fprintf(d, "{\"%s\", %d, %d, %d, %d, %d, %d, %d, %d, moves%d}",
+        fprintf(d, "{\"%s\", 0, 0, %d, %d, %d, %d, %d, %d, %d, %d, moves%d}",
                 cybers[i]->name,
                 cybers[i]->health,
                 cybers[i]->attack,
