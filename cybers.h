@@ -57,9 +57,15 @@ typedef struct __attribute__((packed)) t_cyber {
     int statmanip; // Resistance + competency in stat blights
 } t_cyber_t;
 
+/**
+ * Truncated game state for the server to send back to the clients.
+ *   Includes t_cyber_ts to avoid sending pointers across network
+ */
 typedef struct t_game {
-    int active_p1;
-    int active_p2;
+    int running;
+
+    int actives[2];
+
     t_cyber_t elems[6];
 } t_game_t;
 
@@ -69,11 +75,11 @@ typedef struct t_game {
  *   making up both players cybers.
  */
 typedef struct game {
-    int active_p1;
-    int active_p2;
+    int running;
 
-    cyber_t p1[3];
-    cyber_t p2[3];
+    int actives[2];
+
+    cyber_t elems[6];
 } game_t;
 
 /**

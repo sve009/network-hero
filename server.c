@@ -34,15 +34,13 @@ void prep_cyber(t_cyber_t* dest, cyber_t* src) {
 // Prep game_t into t_game_t to send to client
 void prep_game(t_game_t* dest, game_t* src) {
     // Set actives
-    dest->active_p1 = src->active_p1;
-    dest->active_p2 = src->active_p2;
+    dest->actives[0] = src->actives[0];
+    dest->actives[1] = src->actives[1];
 
     // Set cybers
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 6; i++) {
         // Copy p1[i]
-        prep_cyber(&dest->elems[i], &state.p1[i]);
-        // Copy p2[i]
-        prep_cyber(&dest->elems[i+3], &state.p2[i]);
+        prep_cyber(&dest->elems[i], &state.elems[i]);
     }
 }
 
@@ -92,11 +90,7 @@ void* client_setup(void* sock_fd) {
         }
 
         // Set cyber
-        if (data->player_no == 0) {
-            memcpy(&state.p1[n], &cybers[i], sizeof(cyber_t));
-        } else {
-            memcpy(&state.p2[n], &cybers[i], sizeof(cyber_t));
-        }
+        memcpy(&state.elems[i + (3 * data->player_no)], &cybers[i], sizeof(cyber_t));
 
         // Increment n
         n++;
@@ -131,13 +125,8 @@ void setup_clients(int clients[]) {
     // Send initial opponent choices back to client
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 3; j++) {
-            if (i == 0) {
-                printf("Sending: %s\n", state.p2[j].name);
-                write(clients[i], state.p2[j].name, sizeof(char)*50);
-            } else {
-                printf("Sending: %s\n", state.p1[j].name);
-                write(clients[i], state.p1[j].name, sizeof(char)*50);
-            }
+            printf("Sending: %s\n", state.elems[j + ((1 - i) * 3)].name);
+            write(clients[i], state.elems[j + ((1 - i) * 3)].name, sizeof(char)*50);
         }
     }
 }
@@ -148,16 +137,16 @@ int main(int argc, char** args) {
     srand(time(NULL));
 
     // Set the initial party
-    for (int i = 0; i < 3; i++) {
-        memcpy(&state.p1[i], cybers, sizeof(cyber_t));
-        memcpy(&state.p2[i], cybers, sizeof(cyber_t));
-        // initial_state.p1[i] = cybers[0];
-        // initial_state.p2[i] = cybers[0];
+    for (int i = 0; i < 6; i++) {
+        memcpy(&state.elems[i], cybers, sizeof(cyber_t));
     }
 
     // Set initial active as well
-    state.active_p1 = 0;
-    state.active_p2 = 0;
+    state.actives[0] = 0;
+    state.actives[1] = 3;
+
+    // Start game
+    state.running = 1;
 
     // Create socket
     int connect_sock;
@@ -257,19 +246,13 @@ int main(int argc, char** args) {
             if (strcmp(actions[i]->specifier, "swap") == 0) {
                 char swap_msg[50];
                 int choice = atoi(actions[i]->arg);
-                if (i == 0) {
-                    state.active_p1 = choice;
 
-                    // Add description to response message
-                    sprintf(swap_msg, "Player 0 swapped to %s\n", state.p1[state.active_p1].name);
-                    strcat(resp_mess, swap_msg); 
-                } else {
-                    state.active_p2 = choice;
-
-                    // Add description to response message
-                    sprintf(swap_msg, "Player 1 swapped to %s\n", state.p2[state.active_p2].name);
-                    strcat(resp_mess, swap_msg); 
-                }
+                // Switch active
+                state.actives[i] = choice;
+                
+                // Add description to response message
+                sprintf(swap_msg, "Player %d swapped to %s\n", i, state.elems[state.actives[i]].name);
+                strcat(resp_mess, swap_msg); 
             }
         }
 
@@ -305,14 +288,27 @@ int main(int argc, char** args) {
                 // Move lookup to turn move name into struct
                 move_t* m = lookup_move(actions[i]->arg);
 
-                if (i == 0) {
-                    attack(&state.p1[state.active_p1], &state.p2[state.active_p2], m, p2_guard, move_mess);
-                } else {
-                    attack(&state.p2[state.active_p2], &state.p1[state.active_p1], m, p1_guard, move_mess);
-                }
+                // Run attack
+                attack(&state.elems[state.actives[i]], &state.elems[state.actives[1 - i]], m, p2_guard, move_mess);
 
                 // Add log message
                 strcat(resp_mess, move_mess);
+            }
+        }
+
+        // Check if game is over
+        for (int i = 0; i < 2; i++) {
+            if (
+                    state.elems[3*i].health <= 0
+                    && state.elems[1 + (3 * i)].health <= 0
+                    && state.elems[2 + (3 * i)].health <= 0
+               ) {
+                state.running = 0;
+
+                // Log that game is over
+                char b[20];
+                sprintf(b, "Player %d loses\n", i);
+                strcat(resp_mess, b);
             }
         }
 

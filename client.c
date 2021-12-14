@@ -23,8 +23,8 @@ void print_cyber(cyber_t* cyber) {
 
 // Print out the info that user needs to know when asked
 void print_game() {
-    print_cyber(&initial_state.p1[initial_state.active_p1]);
-    print_cyber(&initial_state.p2[initial_state.active_p2]);
+    print_cyber(&initial_state.elems[initial_state.actives[0]]);
+    print_cyber(&initial_state.elems[initial_state.actives[1]]);
 }
 
 void restore_cyber(cyber_t* dest, t_cyber_t* src) {
@@ -41,13 +41,15 @@ void restore_cyber(cyber_t* dest, t_cyber_t* src) {
 void update_gamestate(t_game_t* m) {
     for (int i = 0; i < 3; i++) {
         // Copy the truncated data into local game state
-        memcpy(&initial_state.p1[i].curr_stat, &m->elems[i], sizeof(t_cyber_t));
-        memcpy(&initial_state.p2[i].curr_stat, &m->elems[i+3], sizeof(t_cyber_t));
+        memcpy(&initial_state.elems[i].curr_stat, &m->elems[i], sizeof(t_cyber_t));
+        memcpy(&initial_state.elems[i+3].curr_stat, &m->elems[i+3], sizeof(t_cyber_t));
     }
 
     // Copy active p1 and p2
-    initial_state.active_p1 = m->active_p1;
-    initial_state.active_p2 = m->active_p2;
+    printf("Prev: %d, Curr: %d\n", initial_state.actives[0], m->actives[0]);
+    printf("%s\n", initial_state.elems[m->actives[0]].name);
+    initial_state.actives[0] = m->actives[0];
+    initial_state.actives[1] = m->actives[1];
 }
 
 // Choose 3 Cybers to play with
@@ -91,10 +93,10 @@ void game_setup(int serv_sock) {
            // Update state
            //   Need to update this here since
            //   we can't send pointers across
-           if (player_n == 0) {
-               memcpy(&initial_state.p1[n], &cybers[i], sizeof(cyber_t));
-           } else{
-               memcpy(&initial_state.p2[n], &cybers[i], sizeof(cyber_t));
+           for (int j = 0; j < 2; j++) {
+               memcpy(&initial_state.elems[n + (3*player_n)],
+                       &cybers[i],
+                       sizeof(cyber_t));
            }
            
            // Send to server
@@ -130,11 +132,11 @@ void game_setup(int serv_sock) {
         }
 
         // Set cyber
-        if (player_n == 0) {
-            memcpy(&initial_state.p2[n], &cybers[i], sizeof(cyber_t));
-        } else {
-            memcpy(&initial_state.p1[n], &cybers[i], sizeof(cyber_t));
-        }
+       for (int j = 0; j < 2; j++) {
+           memcpy(&initial_state.elems[n + (3*(1 - player_n))],
+                   &cybers[i],
+                   sizeof(cyber_t));
+       }
 
         // Increment n
         n++;
@@ -176,15 +178,16 @@ void server_connect(int* serv_sock, struct sockaddr_in* info) {
 int main(int argc, char** args) {
     // Set the initial party
     for (int i = 0; i < 3; i++) {
-        memcpy(&initial_state.p1[i], cybers, sizeof(cyber_t));
-        memcpy(&initial_state.p2[i], cybers, sizeof(cyber_t));
-        // initial_state.p1[i] = cybers[0];
-        // initial_state.p2[i] = cybers[0];
+        memcpy(&initial_state.elems[i], cybers, sizeof(cyber_t));
+        memcpy(&initial_state.elems[i+3], cybers, sizeof(cyber_t));
     }
 
     // Set initial active as well
-    initial_state.active_p1 = 0;
-    initial_state.active_p2 = 0;
+    initial_state.actives[0] = 0;
+    initial_state.actives[1] = 3;
+
+    // Start game
+    initial_state.running = 1;
 
     // Handle arguments
     if (argc != 3) {
@@ -218,16 +221,13 @@ int main(int argc, char** args) {
 
 
     // Loop forever
-    while (true) {
+    while (initial_state.running) {
         // Action chosen flag
         int valid_choice = 0;
         int block = 0;
 
         // Death cases
-        if (player_n == 0 && initial_state.p1[initial_state.active_p1].health <= 0) {
-            menu = 2;
-        }
-        if (player_n == 1 && initial_state.p2[initial_state.active_p2].health <= 0) {
+        if (initial_state.elems[initial_state.actives[player_n]].health <= 0) {
             menu = 2;
         }
 
@@ -267,24 +267,13 @@ int main(int argc, char** args) {
             } else if (menu == 1) {
                 // Print out moves of active cyber
                 int i = 0;
-                if (player_n == 0) {
-                    while (initial_state.p1[initial_state.active_p1].moves[i] != NULL && i < 4) {
-                        printf("%s\n", initial_state.p1[initial_state.active_p1].moves[i++]);
-                    }
-                } else {
-                    while (initial_state.p2[initial_state.active_p2].moves[i] != NULL && i < 4) {
-                        printf("%s\n", initial_state.p2[initial_state.active_p2].moves[i++]);
-                    }
+                while (initial_state.elems[initial_state.actives[player_n]].moves[i] != NULL && i < 4) {
+                    printf("%s\n", initial_state.elems[initial_state.actives[player_n]].moves[i++]);
                 }
-
             } else if (menu == 2) {
                 // Print out list of cybers to switch to
                 for (int i = 0; i < 3; i++) {
-                    if (player_n == 0) {
-                        print_cyber(&initial_state.p1[i]);
-                    } else {
-                        print_cyber(&initial_state.p2[i]);
-                    }
+                    print_cyber(&initial_state.elems[i + (3 * player_n)]);
                 }
             } 
 
@@ -336,103 +325,54 @@ int main(int argc, char** args) {
             }
         } else if (menu == 1) {
             int i = 0;
-            if (player_n == 0) {
-                while (initial_state.p1[initial_state.active_p1].moves[i] != NULL && i < 4) {
-                    if (strcmp(buffer, initial_state.p1[initial_state.active_p1].moves[i]) == 0) {
-                        // Create action
-                        action_t send;
-                        sprintf(send.specifier, "move");
-                        sprintf(send.arg, "%s", initial_state.p1[initial_state.active_p1].moves[i]);
+            while (initial_state.elems[initial_state.actives[player_n]].moves[i] != NULL && i < 4) {
+                if (strcmp(buffer, initial_state.elems[initial_state.actives[player_n]].moves[i]) == 0) {
+                    // Create action
+                    action_t send;
+                    sprintf(send.specifier, "move");
+                    sprintf(send.arg, "%s", initial_state.elems[initial_state.actives[player_n]].moves[i]);
 
-                        // Send action
-                        write(serv_sock, &send, sizeof(action_t));
+                    // Send action
+                    write(serv_sock, &send, sizeof(action_t));
 
-                        // Update flag
-                        valid_choice = 1;
-                        block = 1;
+                    // Update flag
+                    valid_choice = 1;
+                    block = 1;
 
-                        // Update back to top-level menu
-                        menu = 0;
+                    // Update back to top-level menu
+                    menu = 0;
 
-                        break;
-                    }
-                    i++;
+                    break;
                 }
-            } else {
-                while (initial_state.p2[initial_state.active_p2].moves[i] != NULL && i < 4) {
-                    if (strcmp(buffer, initial_state.p2[initial_state.active_p2].moves[i]) == 0) {
-                        // Create action
-                        action_t send;
-                        sprintf(send.specifier, "move");
-                        sprintf(send.arg, "%s", initial_state.p2[initial_state.active_p2].moves[i]);
-
-                        // Send action
-                        write(serv_sock, &send, sizeof(action_t));
-
-                        // Update flag
-                        valid_choice = 1;
-                        block = 1;
-
-                        // Update back to top-level menu
-                        menu = 0;
-
-                        break;
-                    }
-                    i++;
-                }
+                
+                // Increment i
+                i++;
             }
         } else if (menu == 2) {
             // Switch case
             for (int i = 0; i < 3; i++) {
-                if (player_n == 0) {
-                    if (i == initial_state.active_p1) {
-                        printf("That cyber is already active!\n");
-                        continue;
-                    }
-                    if (strcmp(buffer, initial_state.p1[i].name) == 0) {
-                        // Create action
-                        action_t send;
-                        sprintf(send.specifier, "swap");
-                        sprintf(send.arg, "%d", i);
-
-                        // Send action
-                        write(serv_sock, &send, sizeof(action_t));
-
-                        // Update flag
-                        valid_choice = 1;
-                        block = 1;
-
-                        // Update back to top-level menu
-                        menu = 0;
-
-                        break;
-                    }
-                } else {
-                    if (i == initial_state.active_p2) {
-                        printf("That cyber is already active!\n");
-                        continue;
-                    }
-                    if (strcmp(buffer, initial_state.p2[i].name) == 0) {
-                        // Create action
-                        action_t send;
-                        sprintf(send.specifier, "swap");
-                        sprintf(send.arg, "%d", i);
-
-                        // Send action
-                        write(serv_sock, &send, sizeof(action_t));
-
-                        // Update flag
-                        valid_choice = 1;
-                        block = 1;
-
-                        // Update back to top-level menu
-                        menu = 0;
-
-                        break;
-                    }
+                if (i + 3 == initial_state.actives[player_n]) {
+                    printf("That cyber is already active!\n");
+                    continue;
                 }
-                // Increment i if not found
-                i++;
+                if (strcmp(buffer, initial_state.elems[i + (3 * player_n)].name) == 0) {
+                    // Create action
+                    action_t send;
+                    sprintf(send.specifier, "swap");
+                    sprintf(send.arg, "%d", i + (3 * player_n));
+
+                    // Send action
+                    write(serv_sock, &send, sizeof(action_t));
+
+                    // Update flag
+                    valid_choice = 1;
+                    block = 1;
+
+                    // Update back to top-level menu
+                    menu = 0;
+
+                    break;
+                }
             }
         }
 
