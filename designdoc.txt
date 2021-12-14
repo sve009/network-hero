@@ -1,5 +1,28 @@
 Design:
 
+TO DO:
+- Game end code
+- Clean up code (arrays vs p1 p2)
+- BUGS
+- Ensure it works across network (print ip)
+- Rewrite so compiles on linux
+- Design cybermon thingies
+- Design movelist
+- Rewrite initial connection server code
+- Comment + error check
+- Decrement status counter in server loop
+
+Presentation:
+- Have them play it!
+- Discussion points
+  - Attack + Status + Dodge math
+  - Game state design
+  - Implementation details
+    - Server + client code
+    - UI
+    - Threading
+    - Parser
+
 Tools:
   - SDL
 

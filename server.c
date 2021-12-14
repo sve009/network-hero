@@ -7,7 +7,6 @@
 #include <unistd.h>
 
 #include "cybers.h"
-#include "conv.h"
 #include "cyberlist.h"
 #include "movelist.h"
 #include "actions.h"

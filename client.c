@@ -8,7 +8,6 @@
 
 #include "cybers.h"
 #include "cyberlist.h"
-#include "conv.h"
 
 game_t initial_state; 
 
@@ -45,6 +44,10 @@ void update_gamestate(t_game_t* m) {
         memcpy(&initial_state.p1[i].curr_stat, &m->elems[i], sizeof(t_cyber_t));
         memcpy(&initial_state.p2[i].curr_stat, &m->elems[i+3], sizeof(t_cyber_t));
     }
+
+    // Copy active p1 and p2
+    initial_state.active_p1 = m->active_p1;
+    initial_state.active_p2 = m->active_p2;
 }
 
 // Choose 3 Cybers to play with
@@ -382,6 +385,10 @@ int main(int argc, char** args) {
             // Switch case
             for (int i = 0; i < 3; i++) {
                 if (player_n == 0) {
+                    if (i == initial_state.active_p1) {
+                        printf("That cyber is already active!\n");
+                        continue;
+                    }
                     if (strcmp(buffer, initial_state.p1[i].name) == 0) {
                         // Create action
                         action_t send;
@@ -401,6 +408,10 @@ int main(int argc, char** args) {
                         break;
                     }
                 } else {
+                    if (i == initial_state.active_p2) {
+                        printf("That cyber is already active!\n");
+                        continue;
+                    }
                     if (strcmp(buffer, initial_state.p2[i].name) == 0) {
                         // Create action
                         action_t send;

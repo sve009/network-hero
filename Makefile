@@ -10,12 +10,9 @@ movelist:
 actions:
 	$(CC) -c actions.c
 
-conv: 
-	$(CC) -c conv.c
+client: 
+	$(CC) -o bin/client client.c
 
-client: conv.o
-	$(CC) -o bin/client client.c conv.o
-
-server: conv.o movelist.o actions.o
-	$(CC) -o bin/server server.c conv.o actions.o movelist.o
+server: movelist.o actions.o
+	$(CC) -o bin/server server.c actions.o movelist.o
 

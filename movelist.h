@@ -3,7 +3,7 @@
 
 #include "cybers.h"
 
-static move_t moves[5] = {
+static move_t moves[] = {
     {"blah", 10, 10, 0, -1, 0},
     {"blab", 10, 10, 0, -1, 0},
     {"ha", 10, 10, 0, -1, 0},
