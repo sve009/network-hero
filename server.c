@@ -296,6 +296,11 @@ int main(int argc, char** args) {
             }
         }
 
+        // Decrement status timer
+        for (int i = 0; i < 6; i++) {
+            state.elems[i].stat_durr--;
+        }
+
         // Check if game is over
         for (int i = 0; i < 2; i++) {
             if (
