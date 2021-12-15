@@ -129,8 +129,15 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     printf("SAttack mod: %d\n", satt_mod);
     printf("Bonus_damage: %d\n", bonus_damage);
     printf("Bonus SDamage: %d\n", bonus_sdamage);
-    int damage = (move->damage + bonus_damage) * att_mod;
-    damage += (move->sdamage + bonus_sdamage) * satt_mod;
+    if (move->damage != 0) {
+        int damage = (move->damage + bonus_damage) * att_mod;
+    } else {
+        int damage = 0;
+    }
+    if (move->sdamage != 0) {
+        damage += (move->sdamage + bonus_sdamage) * satt_mod;
+    }
+    
 
     //guarding results in less damage for defender
     if (guard) {
