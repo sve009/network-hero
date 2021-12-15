@@ -1,16 +1,15 @@
 Design:
 
 TO DO:
-- Game end code
-- Clean up code (arrays vs p1 p2)
-- BUGS
+- Game end code DONE
+- BUGS (NO ACTIVE THAT I KNOW OF)
 - Ensure it works across network (print ip)
 - Rewrite so compiles on linux
 - Design cybermon thingies
 - Design movelist
 - Rewrite initial connection server code
-- Comment + error check
-- Decrement status counter in server loop
+- Comment + error check IN PROGRESS
+- Decrement status counter in server loop DONE
 
 Presentation:
 - Have them play it!
