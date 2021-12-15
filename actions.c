@@ -43,9 +43,9 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     
     //calculating dodge roll with status effects considered
     int dodge_roll = (attacker->agility - defender->agility) + (rand() % 20);
-    if (defender->curr_stat == 0) {
+    if (defender->curr_stat == 0 || defender->curr_stat == 4) {
         dodge_roll -= 5;
-    } else if (attacker->curr_stat == 0) {
+    } else if (attacker->curr_stat == 0 || attacker->curr_stat == 4) {
         dodge_roll += 5;
     }
     if (dodge_roll < 8) {
@@ -99,6 +99,9 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     } else if (attacker->curr_stat == 2) {
         att_mod--;
         satt_mod--;
+    } else if (attacker->curr_stat == 4) {
+	att_mod--;
+	satt_mod--;
     }
     if (defender->curr_stat == 2) {
         att_mod++;
@@ -106,6 +109,9 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     } else if (defender->curr_stat == 3) {
         att_mod--;
         satt_mod--;
+    } else if (defender->curr_stat == 4) {
+	att_mod--;
+	satt_mod--;
     }
 
     //attack defense stat comparisons, maybe this just functions at bonus damage
@@ -142,11 +148,11 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
         if (move->status_target == 0){
             if (((attacker->statmanip - defender->statmanip) + (rand() % 20)) > 20) {
                 defender->curr_stat = move->status_eff;
-                defender->stat_durr = 1;
+                defender->stat_durr = 2;
             }
         } else {
             attacker->curr_stat = move->status_eff;
-            attacker->stat_durr = 1;
+            attacker->stat_durr = 2;
         }
     }
     
