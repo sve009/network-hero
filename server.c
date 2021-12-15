@@ -93,7 +93,7 @@ void* client_setup(void* sock_fd) {
         }
 
         // Set cyber
-        memcpy(&state.elems[i + (3 * data->player_no)], &cybers[i], sizeof(cyber_t));
+        memcpy(&state.elems[n + (3 * data->player_no)], &cybers[i], sizeof(cyber_t));
 
         // Increment n
         n++;

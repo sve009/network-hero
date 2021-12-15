@@ -352,11 +352,18 @@ int main(int argc, char** args) {
         } else if (menu == 2) {
             // Switch case
             for (int i = 0; i < 3; i++) {
-                if (i + 3 == initial_state.actives[player_n]) {
-                    printf("That cyber is already active!\n");
-                    continue;
-                }
                 if (strcmp(buffer, initial_state.elems[i + (3 * player_n)].name) == 0) {
+                    // Dead case
+                    if (initial_state.elems[i + (3 * player_n)].health <= 0) {
+                        printf("That cyber is dead!\n");
+                        break;
+                    }
+
+                    // Active case
+                    if (i + (3 * player_n) == player_n) {
+                        printf("That cyber is already active!\n");
+                    }
+
                     // Create action
                     action_t send;
                     sprintf(send.specifier, "swap");

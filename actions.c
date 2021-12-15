@@ -77,6 +77,7 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
         (defender->element == 4 && attacker->element == 3)) {
             att_mod++;
             satt_mod++;            
+            strcat(log, "It was super effective!\n");
     } else if (
         (defender->element == 0 && attacker->element == 2) ||
         (defender->element == 0 && attacker->element == 4) ||
@@ -90,6 +91,7 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
         (defender->element == 4 && attacker->element == 1)) {
             att_mod--;
             satt_mod--;
+            strcat(log, "It wasn't very effective!\n");
     }
 
     //status effect checks
