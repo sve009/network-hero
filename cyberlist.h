@@ -1,6 +1,6 @@
 #ifndef CYBERLIST
 #define CYBERLIST
-static int num_cybers = 10;
+static int num_cybers = 11;
 char* moves0[] = {"fireball", "kick", "rally", "barbeque"};
 char* moves1[] = {"lightning bolt", "thunder gun", "tail whip", "bite"};
 char* moves2[] = {"rock slide", "crush", "slam", "harden"};
