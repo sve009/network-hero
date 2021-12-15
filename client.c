@@ -46,8 +46,6 @@ void update_gamestate(t_game_t* m) {
     }
 
     // Copy active p1 and p2
-    printf("Prev: %d, Curr: %d\n", initial_state.actives[0], m->actives[0]);
-    printf("%s\n", initial_state.elems[m->actives[0]].name);
     initial_state.actives[0] = m->actives[0];
     initial_state.actives[1] = m->actives[1];
 

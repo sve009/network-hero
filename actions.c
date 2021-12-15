@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "cybers.h"
 #include "actions.h"
@@ -42,13 +43,14 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     //so I assume that we'll need like attack rolls, so random and time are probably going to be necessary
     
     //calculating dodge roll with status effects considered
-    int dodge_roll = (attacker->agility - defender->agility) + (rand() % 20);
+    int mult = round(((float)attacker->agility) / ((float)defender->agility));
+    int dodge_roll = mult * (rand() % 20);
     if (defender->curr_stat == 0 || defender->curr_stat == 4) {
         dodge_roll -= 5;
     } else if (attacker->curr_stat == 0 || attacker->curr_stat == 4) {
         dodge_roll += 5;
     }
-    if (dodge_roll < 8) {
+    if (dodge_roll < 4) {
         //attack unsuccessful
 
         // Log
@@ -121,6 +123,10 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     int bonus_sdamage = attacker->sattack - defender->sdefense;
     
     //damage calculation will be a combination of additive and multiplicative damage mods
+    printf("Attack mod: %d\n", att_mod);
+    printf("SAttack mod: %d\n", satt_mod);
+    printf("Bonus_damage: %d\n", bonus_damage);
+    printf("Bonus SDamage: %d\n", bonus_sdamage);
     int damage = (move->damage + bonus_damage) * att_mod;
     damage += (move->sdamage + bonus_sdamage) * satt_mod;
 
