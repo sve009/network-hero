@@ -119,6 +119,8 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     //attack defense stat comparisons, maybe this just functions at bonus damage
     int bonus_damage = attacker->attack - defender->defense;
     int bonus_sdamage = attacker->sattack - defender->sdefense;
+    if (bonus_damage < 0) bonus_damage = 0;
+    if (bonus_sdamage < 0) bonus_sdamage = 0;
     
     //damage calculation will be a combination of additive and multiplicative damage mods
     int damage = (move->damage + bonus_damage) * att_mod;
