@@ -5,7 +5,7 @@
 static const char* elements[] = {"Fire", "Water", "Rock", "Electric", "Air"};
 
 // Status lookup table
-static const char* statuses[] = {"Dizzy", "Enraged", "Weakened", "Hardened"};
+static const char* statuses[] = {"Dizzy", "Enraged", "Weakened", "Hardened", "Frozen"};
 
 /**
  * This struct holds the necessary information to calculate
