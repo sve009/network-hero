@@ -50,6 +50,9 @@ void update_gamestate(t_game_t* m) {
     printf("%s\n", initial_state.elems[m->actives[0]].name);
     initial_state.actives[0] = m->actives[0];
     initial_state.actives[1] = m->actives[1];
+
+    // Copy whether the game is running
+    initial_state.running = m->running;
 }
 
 // Choose 3 Cybers to play with
@@ -120,8 +123,6 @@ void game_setup(int serv_sock) {
     while (n < 3) {
         // Read in cyber name
         read(serv_sock, buffer, sizeof(char) * 50);
-
-        printf("Read: %s\n", buffer);
 
         // Look up cyber (Client checks validity)
         int i;

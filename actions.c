@@ -16,7 +16,7 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     // Log
     char temp[100];
     memset(temp, 0, sizeof(char)*100);
-    sprintf(temp, "Used %s\n", move->name);
+    sprintf(temp, "%s used %s\n", attacker -> name, move->name);
     strcat(log, temp);
     
     

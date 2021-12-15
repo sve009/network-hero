@@ -33,6 +33,9 @@ void prep_cyber(t_cyber_t* dest, cyber_t* src) {
 
 // Prep game_t into t_game_t to send to client
 void prep_game(t_game_t* dest, game_t* src) {
+    // Set game running
+    dest->running = src->running;
+
     // Set actives
     dest->actives[0] = src->actives[0];
     dest->actives[1] = src->actives[1];
