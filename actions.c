@@ -8,6 +8,14 @@
 #include "cybers.h"
 #include "actions.h"
 
+int min_cap(int dmg) {
+    if (dmg < 5) {
+        return 5;
+    } else {
+        return dmg;
+    }
+}
+
 /**
  * Note: Assume rand is already seeded
  */
@@ -44,13 +52,14 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     
     //calculating dodge roll with status effects considered
     int mult = round(((float)attacker->agility) / ((float)defender->agility));
-    int dodge_roll = mult * (rand() % 20);
+    int roll = rand() % 20;
+    int dodge_roll = mult * roll;
     if (defender->curr_stat == 0 || defender->curr_stat == 4) {
         dodge_roll -= 5;
     } else if (attacker->curr_stat == 0 || attacker->curr_stat == 4) {
         dodge_roll += 5;
     }
-    if (dodge_roll < 4) {
+    if (dodge_roll < 4 && roll <= 18) {
         //attack unsuccessful
 
         // Log
@@ -129,6 +138,7 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     printf("SAttack mod: %d\n", satt_mod);
     printf("Bonus_damage: %d\n", bonus_damage);
     printf("Bonus SDamage: %d\n", bonus_sdamage);
+    int damage = 0;
     if (move->damage != 0) {
         int damage = (move->damage + bonus_damage) * att_mod;
     } else {
@@ -144,7 +154,7 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
         damage = damage / 2;
     }
     //update cyber's health, status, and the move's pp
-    defender->health -= damage;
+    defender->health -= min_cap(damage);
 
     // Log
     char dmg[50];
