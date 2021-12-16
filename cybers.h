@@ -2,7 +2,7 @@
 #define CYBER_H
 
 // Element lookup table
-static const char* elements[] = {"Fire", "Water", "Rock", "Electric", "Air"};
+static const char* elements[] = {"Fire", "Water", "Air", "Rock", "Electric"};
 
 // Status lookup table
 static const char* statuses[] = {"Dizzy", "Enraged", "Weakened", "Hardened", "Frozen"};

@@ -159,7 +159,7 @@ int attack(cyber_t * attacker, cyber_t * defender, move_t * move, int guard, cha
     // Log
     char dmg[50];
     memset(dmg, 0, sizeof(char)*50);
-    sprintf(dmg, "It did %d damage\n", damage);
+    sprintf(dmg, "It did %d damage\n", min_cap(damage));
     strcat(log, dmg);
 
     // Log death cases
