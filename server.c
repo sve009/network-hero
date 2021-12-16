@@ -217,7 +217,7 @@ int main(int argc, char** args) {
             pthread_create(&threads[i], NULL, listen_client, (void*)&clients[i]);
 
             // Error check
-            if (threads[i] == NULL) {
+            if (threads[i] == 0) {
                 perror("Thread creation failed");
                 exit(2);
             }
