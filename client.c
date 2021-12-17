@@ -101,7 +101,10 @@ void game_setup(int serv_sock) {
            }
            
            // Send to server
-           write(serv_sock, buffer, sizeof(char)*50);
+           if (write(serv_sock, buffer, sizeof(char)*50) == -1) {
+	       perror("Failed to send to server\n");
+	       exit(2);
+	   }
 
            // Increment n
            n++;
@@ -120,7 +123,10 @@ void game_setup(int serv_sock) {
     // Read in 3 cybers opponent chose
     while (n < 3) {
         // Read in cyber name
-        read(serv_sock, buffer, sizeof(char) * 50);
+        if (read(serv_sock, buffer, sizeof(char) * 50) == -1) {
+	    perror("Read cyber name from server failed\n");
+	    exit(2);
+	}
 
         // Look up cyber (Client checks validity)
         int i;
@@ -166,7 +172,10 @@ void server_connect(int* serv_sock, struct sockaddr_in* info) {
     printf("Waiting for opponent to connect...\n");
     
     // Read player number from server
-    read(*serv_sock, &player_n, sizeof(int));
+    if (read(*serv_sock, &player_n, sizeof(int)) == -1) {
+	perror("Read player number failed\n");
+	exit(2);
+    }
 
     // Notify player
     printf("You are player %d\n", player_n);
@@ -316,7 +325,10 @@ int main(int argc, char** args) {
                 sprintf(send.arg, "");
 
                 // Send action
-                write(serv_sock, &send, sizeof(action_t));
+                if (write(serv_sock, &send, sizeof(action_t)) == -1) {
+		    perror("Failed to send action\n");
+		    exit(2);
+		}
 
                 // Update flag
                 valid_choice = 1;
@@ -332,7 +344,10 @@ int main(int argc, char** args) {
                     sprintf(send.arg, "%s", initial_state.elems[initial_state.actives[player_n]].moves[i]);
 
                     // Send action
-                    write(serv_sock, &send, sizeof(action_t));
+                    if (write(serv_sock, &send, sizeof(action_t)) == -1) {
+			perror("Failed to send action\n");
+			exit(2);
+		    }
 
                     // Update flag
                     valid_choice = 1;
@@ -368,7 +383,10 @@ int main(int argc, char** args) {
                     sprintf(send.arg, "%d", i + (3 * player_n));
 
                     // Send action
-                    write(serv_sock, &send, sizeof(action_t));
+                    if (write(serv_sock, &send, sizeof(action_t)) == -1) {
+			perror("Failed to send action\n");
+			exit(2);
+		    }
 
                     // Update flag
                     valid_choice = 1;
@@ -397,14 +415,20 @@ int main(int argc, char** args) {
             t_game_t temp;
 
             // Read server response
-            read(serv_sock, &temp, sizeof(t_game_t));
+            if (read(serv_sock, &temp, sizeof(t_game_t)) == -1) {
+		perror("Read from server failed\n");
+		exit(2);
+	    }
 
             // Update the game state
             update_gamestate(&temp);
 
             // Get response message
             char response_mess[200];
-            read(serv_sock, response_mess, sizeof(char) * 200);
+            if (read(serv_sock, response_mess, sizeof(char) * 200) == -1) {
+		perror("read response from server failed\n");
+		exit(2);
+	    }
 
             // Print response message
             printf("%s", response_mess);

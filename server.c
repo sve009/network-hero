@@ -51,12 +51,18 @@ void prep_game(t_game_t* dest, game_t* src) {
 void* listen_client(void* sock_fd) {
     // Action to pass into parser
     action_t* a = malloc(sizeof(action_t));
-
+    if (a == NULL) {
+	perror("Malloc Failed\n");
+	exit(2);
+    }
     // Grab the socket fd
     int fd = *(int*)sock_fd;
 
     // Wait to receive action
-    read(fd, a, sizeof(action_t));
+    if (read(fd, a, sizeof(action_t)) == -1) {
+	perror("Read Failed\n");
+	exit(2);
+    }
 
     // Return the action
     return (void*)a;
@@ -79,7 +85,10 @@ void* client_setup(void* sock_fd) {
     // Loop until all three chosen
     while (n < 3) {
         // Read in cyber name
-        read(data->client, buffer, sizeof(char) * 50);
+        if (read(data->client, buffer, sizeof(char) * 50) == -1) {
+	    perror("Failed to read in cyber name\n");
+	    exit(2);
+	}
 
         // Debug
         printf("%s\n", buffer);
@@ -117,19 +126,28 @@ void setup_clients(int clients[]) {
         args[i].player_no = i;
 
         // Create thread
-        pthread_create(&threads[i], NULL, client_setup, (void*)&args[i]);
+        if (pthread_create(&threads[i], NULL, client_setup, (void*)&args[i]) != 0) {
+	    perror("Error in Thread Creation\n");
+	    exit(2);
+	}
     }
 
     // Wait for inputs
     for (int i = 0; i < 2; i++) {
-        pthread_join(threads[i], NULL);
+        if (pthread_join(threads[i], NULL) != 0){
+	    perror("Error in Joining Threads\n");
+	    exit(2);
+	}
     }
 
     // Send initial opponent choices back to client
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 3; j++) {
             printf("Sending: %s\n", state.elems[j + ((1 - i) * 3)].name);
-            write(clients[i], state.elems[j + ((1 - i) * 3)].name, sizeof(char)*50);
+            if (write(clients[i], state.elems[j + ((1 - i) * 3)].name, sizeof(char)*50) == -1) {
+		perror("Write Failed\n");
+		exit(2);
+	    }
         }
     }
 }
@@ -197,7 +215,10 @@ int main(int argc, char** args) {
 
     // Notify clients that game is starting
     for (int i = 0; i < 2; i++) {
-        write(clients[i], &i, sizeof(int));
+        if(write(clients[i], &i, sizeof(int)) == -1) {
+	    perror("Write to clients failed\n");
+	    exit(2);
+	}
     }
 
     // Setup initial game state
@@ -214,10 +235,13 @@ int main(int argc, char** args) {
         // Spawn threads to listen for actions
         for (int i = 0; i < 2; i++) {
             // Create thread
-            pthread_create(&threads[i], NULL, listen_client, (void*)&clients[i]);
+            if (pthread_create(&threads[i], NULL, listen_client, (void*)&clients[i]) != 0) {
+	        perror("Error in thread creation\n");
+	        exit(2);
+	    }
 
             // Error check
-            if (threads[i] == 0) {
+            if (threads[i] == NULL) {
                 perror("Thread creation failed");
                 exit(2);
             }
@@ -331,9 +355,15 @@ int main(int argc, char** args) {
         // Response to release clients
         for (int i = 0; i < 2; i++) {
             // Current gamestate
-            write(clients[i], &message, sizeof(t_game_t));
+            if (write(clients[i], &message, sizeof(t_game_t))) {
+	        perror("Write Gamestate Failed\n");
+	        exit(2);
+	    }
             // Log messages
-            write(clients[i], resp_mess, sizeof(char)*200);
+            if (write(clients[i], resp_mess, sizeof(char)*200)) {
+		perror("Write Log Messages Failed\n");
+		exit(2);
+	    }
         }
 
         // Cleanup
@@ -344,4 +374,3 @@ int main(int argc, char** args) {
     }
     return 0;
 }
-
